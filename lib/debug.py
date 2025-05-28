@@ -1,9 +1,17 @@
-#!/usr/bin/env python3
+from models import session, Company, Dev, Freebie
+from seed import *
 
-from sqlalchemy import create_engine
+# Test relationships
+print("Company devs:", company1.devs)
+print("Dev companies:", dev1.companies)
 
-from models import Company, Dev
+# Test methods
+print("\\nFreebie details:", freebie1.print_details())
+print("Oldest company:", Company.oldest_company().name)
+print("Dev received mug:", dev1.received_one("Mug"))
+print("Dev received hat:", dev1.received_one("Hat"))
 
-if __name__ == '__main__':
-    engine = create_engine('sqlite:///freebies.db')
-    import ipdb; ipdb.set_trace()
+# Test give_away
+print("\\nBefore give_away:", freebie1.dev.name)
+dev1.give_away(dev2, freebie1)
+print("After give_away:", freebie1.dev.name)
