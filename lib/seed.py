@@ -1,30 +1,49 @@
-from models import Company, Dev, Freebie, session
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
-# Clear existing data
+from models import Base, Company, Dev, Freebie
+
+# Configure your database URL here
+DATABASE_URL = "sqlite:///freebies.db"
+
+engine = create_engine(DATABASE_URL, echo=True)
+Session = sessionmaker(bind=engine)
+session = Session()
+
+# Create all tables
+Base.metadata.create_all(engine)
+
+# Clear any existing data (optional)
 session.query(Freebie).delete()
-session.query(Company).delete()
 session.query(Dev).delete()
+session.query(Company).delete()
 session.commit()
 
-# Create companies
-company1 = Company(name="TechCorp", founding_year=2000)
-company2 = Company(name="DevSoft", founding_year=1995)
-company3 = Company(name="CodeMasters", founding_year=2010)
+# Create some companies
+c1 = Company(name="Acme Corp", founding_year=1990)
+c2 = Company(name="Globex Inc", founding_year=1985)
+c3 = Company(name="Soylent Corp", founding_year=2000)
 
-# Create devs
-dev1 = Dev(name="Alice")
-dev2 = Dev(name="Bob")
-dev3 = Dev(name="Charlie")
-
-# Add and commit
-session.add_all([company1, company2, company3, dev1, dev2, dev3])
+session.add_all([c1, c2, c3])
 session.commit()
 
-# Create freebies
-freebie1 = Freebie(item_name="T-shirt", value=15, dev=dev1, company=company1)
-freebie2 = Freebie(item_name="Stickers", value=5, dev=dev2, company=company1)
-freebie3 = Freebie(item_name="Mug", value=10, dev=dev1, company=company2)
-freebie4 = Freebie(item_name="Laptop", value=1000, dev=dev3, company=company3)
+# Create some devs
+d1 = Dev(name="Alice")
+d2 = Dev(name="Bob")
+d3 = Dev(name="Charlie")
 
-session.add_all([freebie1, freebie2, freebie3, freebie4])
+session.add_all([d1, d2, d3])
 session.commit()
+
+# Give freebies using the company method
+c1.give_freebie(d1, "T-Shirt", 10)
+c1.give_freebie(d2, "Sticker Pack", 5)
+c2.give_freebie(d1, "Coffee Mug", 15)
+c3.give_freebie(d3, "Notebook", 20)
+
+# Commit freebies
+session.commit()
+
+print("Seeding complete!")
+
+session.close()
